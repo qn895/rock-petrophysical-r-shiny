@@ -1,0 +1,16 @@
+require("RCurl")
+require("jsonlite")
+require("dplyr")
+
+# Read in data from DB
+df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
+
+# Display a subset and summary of the data frame 
+summary(df)
+head(df)
+
+subset <- subset(df, HIPERM > .5)
+head(subset)
+
+subset <- subset(df, SYSNM == 'CRETACEOUS')
+head(subset)
