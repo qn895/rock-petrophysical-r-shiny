@@ -1,0 +1,69 @@
+---
+title: "Notebook"
+author: "Hanna Jones"
+date: "October 14, 2016"
+output: html_document
+---
+
+### Session Info
+
+```{r}
+sessionInfo()
+```
+
+### Initial Steps / Getting Started
+
+STEP 1: Find a dataset. Public datasets are available on sites such as the [United States Census Bureau](http://www.census.gov/), [Reddit](https://www.reddit.com/r/datasets), and [UCI](https://archive.ics.uci.edu/ml/datasets/).
+
+STEP 2: Clean up the Data Using Extract, Transform, and Load techniques.
+
+Below is a subset of our data. The data set we used is a table of different oil & gas reservoirs across different states, geological regions, and geological era. In addition, it also contains different sets of the porosity and permeability values. 
+
+```{r}
+source("../01 Data/Data.R", echo = TRUE)
+```
+
+
+### Porosity & Permeability
+
+PLOT #1: SCATTER
+We wanted to analyze the relationship between porosity and permeability for our data. To do this, we created a simple scatter plot to visualize this relationship.
+
+![](../02 Tableau/PorvsPermAll.png)
+
+This graph was slightly difficult to read, and we were also interested in the difference in this relationship depending on the time period. Thus, we separated the graph into pages by era and were left with the following graphs:
+
+![](../02 Tableau/PorvsPermCenezoic.png)
+
+This graph first indicated to us that many Cenezoic substances were found in Texas and Louisiana. We were also able to visualize the positive relationship between porosity and permeability.
+
+![](../02 Tableau/PorvsPermMesezoic.png)
+
+![](../02 Tableau/PorvsPermPaleozoic.png)
+
+In the Paleozoic era, there was significantly less variance in the permeability of these substances.
+
+These graphs introduced to us the hypothesis that different states may have widely varying porosity and permeability. Because scatter ploto makes it a little bit too crowded to interpret the data easily, we created a box plot which represents the range, median, quartiles, and outliers much better.
+
+PLOT #2: BOX PLOT
+
+![](../02 Tableau/PorvsPermState.png)
+
+Interestingly, we can see that permeability varies significantly less than porosity and has a lot more outliers.
+
+We can also see that some state has better average porosity than other, meaning the quality of the oil & gas reservoir is more desirable.
+
+### Histogram of Temperatures
+
+![](../02 Tableau/TempsCenozoic.png)
+![](../02 Tableau/TempsMesezoic.png)
+
+![](../02 Tableau/TempsPaleozoic.png)
+
+These graphs allowed us to understand that in the Paleozoic era, rest temperatures were significantly lower than other eras.
+
+### Geography of Findings
+
+![](../02 Tableau/Geographic.png)
+
+This graph gave us an understanding of the overall geography of our data points. Visualizing it on a map helped us to understand the relative number of data points in each area depending on the area. Eras with more records have larger dots on this map.
