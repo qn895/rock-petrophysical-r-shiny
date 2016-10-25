@@ -15,8 +15,8 @@ headerPanel("Project 4!"),
     # Dropdown to decide which colum to plot the histogram of 
     h3("Histogram Options"),
     selectInput('hist_col_name', 'Variable To Plot Histogram Of', list("AVPOR","LOPOR","HIPOR","AVPERM","LOPERM","HIPERM","RESTEMP"),selected="RESTEMP"),
-    numericInput("num_of_bins", label = ("Enter The Number of Bins"), value = 3),
-    actionButton(inputId="plotHistogram", label="Update Histogram"),
+    numericInput("num_of_bins", label = ("Enter The Number of Bins"), value = 10),
+    actionButton(inputId="plotHistogram", label="Plot or Update Histogram"),
     
     # Dropdown to decide which colum to plot the k-means of _
     h3("K-means Clustering Options"),
@@ -24,7 +24,7 @@ headerPanel("Project 4!"),
     selectInput('y_col_name', 'Y Variable', list("AVPOR","LOPOR","HIPOR","AVPERM","LOPERM","HIPERM","RESTEMP"),selected="AVPERM"),
 
     numericInput("num_of_clusters", label = ("Enter The Amount of Clusters"), value = 3),
-    actionButton(inputId="plotClusters", label="Update Clusters"),
+    actionButton(inputId="plotClusters", label="Plot or Update Clusters"),
     
     
     h3("Main Filtering Options"),
@@ -37,7 +37,8 @@ headerPanel("Project 4!"),
                 label = ("Min and Max of Y Variable"), 
                 min = 0, 
                 max = 100, 
-                value = c(40, 60))
+                value = c(40, 60)),
+    uiOutput("campSelector")
   
     ),
 
