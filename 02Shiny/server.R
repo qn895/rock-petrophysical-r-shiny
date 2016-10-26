@@ -12,11 +12,16 @@ shinyServer(function(input, output) {
   y_col_name <- reactive({input$y_col_name})
 
   # GET DATA
+  # states = c('TEXAS', 'ALABAMA')
+  # state_query = paste("where state in (",paste(states, collapse=", "),")")
   df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
   
+  subset(df)
+  
   selectedHistData <- reactive({
-    df[, c(input$x_col_name)]
+    df[, c(input$hist_col_name)]
   })
+  
   
   # GET DATA, FILTERED BY SELECTED X_COL_NAME AND Y_COL_NAME
   selectedXData <- reactive({
@@ -52,5 +57,31 @@ shinyServer(function(input, output) {
         breaks = as.numeric(input$num_of_bins),
         main = "Frequency")
   })
+<<<<<<< HEAD
+  
+  output$campSelector <- renderUI({
+    states <- unique(df['STATE'])
+    selectInput("state", "Choose State To Filter Data By:", as.list(states),selected="TEXAS") 
+  })
+  
+  
+  formulaText <- reactive({
+    paste("RESTEMP ~", input$variable)
+  })
+  
+  # Return the formula text for printing as a caption
+  output$caption <- renderText({
+    formulaText()
+  })
+  
+  output$boxPlot <- renderPlot({
+    boxplot(as.formula(formulaText()), 
+            data = df,
+            outline = input$outliers)
+  })
   
   })
+=======
+})
+  
+>>>>>>> b085c507635f073b0666c228a8916941f35e41e9
