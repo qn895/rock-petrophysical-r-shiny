@@ -57,5 +57,26 @@ shinyServer(function(input, output) {
         breaks = as.numeric(input$num_of_bins),
         main = "Frequency")
   })
-})
+
+  output$campSelector <- renderUI({
+    states <- unique(df['STATE'])
+    selectInput("state", "Choose State To Filter Data By:", as.list(states),selected="TEXAS") 
+  })
   
+  
+  formulaText <- reactive({
+    paste("RESTEMP ~", input$variable)
+  })
+  
+  # Return the formula text for printing as a caption
+  output$caption <- renderText({
+    formulaText()
+  })
+  
+  output$boxPlot <- renderPlot({
+    boxplot(as.formula(formulaText()), 
+            data = df,
+            outline = input$outliers)
+  })
+  
+  })

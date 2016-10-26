@@ -24,6 +24,13 @@ headerPanel("Project 4!"),
 
     numericInput("num_of_clusters", label = ("Enter The Amount of Clusters"), value = 3),
 
+    h3("Box Plot Filters"),
+    selectInput("variable", "Variable:",
+                list("State" = "STATE", 
+                     "Geologic Era" = "ERANM", 
+                     "Geologic System Name" = "SYSNM")),
+    
+    checkboxInput("outliers", "Show outliers", FALSE),
     
     h3("Main Filtering Options"),
     sliderInput("range_of_x_variable", 
@@ -37,11 +44,13 @@ headerPanel("Project 4!"),
                 max = 100, 
                 value = c(40, 60)),
     actionButton(inputId="updateFilters", label="Update Filters")
-    ),
+  
+),
 
 # Show a plot of the generated distribution
   mainPanel(
     plotOutput("histPlot"),
-    plotOutput("clusterPlot")
+    plotOutput("clusterPlot"),
+    plotOutput("boxPlot")
   )
 ))
