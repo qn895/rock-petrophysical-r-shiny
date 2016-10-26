@@ -126,7 +126,8 @@ shinyServer(function(input, output) {
     boxplot(as.formula(formulaText()), 
             data = df,
             outline = input$outliers,
-            main = paste("Box Plot of", col_dictionary[[input$variable]]))
+            main = paste("Box Plot of", col_dictionary[[input$variable]]),
+            las = 2)
   })
   
   })
