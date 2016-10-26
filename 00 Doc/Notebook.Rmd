@@ -1,21 +1,54 @@
 ---
-title: "Notebook"
-author: "Hanna Jones"
-date: "October 14, 2016"
-output: html_document
+title: "Oil & Gas Wells' Petrophysical and Geographical Data"
+author: "Quynh Nguyen (qmn76), Mark Metzger (mm73828), Hanna Jones ()"
+date: "October 26, 2016"
+output: 
+  html_document:
+    toc: true
 ---
 
-### Session Info
+## Session Info
 
 ```{r}
 sessionInfo()
 ```
 
-### Initial Steps / Getting Started
+## Finding & Processing Data
 
-STEP 1: Find a dataset. Public datasets are available on sites such as the [United States Census Bureau](http://www.census.gov/), [Reddit](https://www.reddit.com/r/datasets), and [UCI](https://archive.ics.uci.edu/ml/datasets/).
+### STEP 1: Find a dataset. 
 
-STEP 2: Clean up the Data Using Extract, Transform, and Load techniques.
+The data set used is extracted from a CSV file called "GASISData.csv" data contains data from GASIS Reservoir Data System. GASIS, or Gas Information System, is an initiative by The Department of Energy to "combine previously compiled public domain data, newly acquired and interpreted data, and newly released data into a single database with over 18,000 reservoir records."
+
+The data set contains comprehensive field/reservoir identification, location, reservoir type, parameters, etc for oil and gas wells across the U.S. and is a useful tool to analyze the wells' petrophysical and geographical data on a large scale.
+
+Column Name | Column Name Explanation
+------------- | -------------
+STATE | state name
+FLDNAME | DOE/EIA field name 
+RESNAME | reservoir name
+R_STUDY | reservoir source (Atlas, Reserv. Study, TOTL)
+PLAYNAME | gas atlas geologic play name 
+PLAYCOD | gas atlas geologic play code
+ERANM | geologic era name
+SUBPLAYN | gas atlas subplay name
+SYSNM | geologic system name
+SERNM | geologic series name
+S_POR | data source for porosity 
+S_PERM | data source for permeability 
+LINKA | unique key for reservoir data system 
+AVPOR | average porosity of pay interval 
+LOPOR | porosity range minimum -net pay
+HIPOR | porosity range maximum -net pay 
+AVPERM | average permeability of pay interval 
+LOPERM | permeability range minimum 
+HIPERM | permeability range maximum 
+RESTEMP | average reservoir temperature 
+
+```{r}
+read.csv("../01 Data/GASISData.csv", stringsAsFactors = FALSE)
+```
+
+### STEP 2: Clean up the data Using Extract, Transform, and Load techniques.
 
 Below is a subset of our data. The data set we used is a table of different oil & gas reservoirs across different states, geological regions, and geological era. In addition, it also contains different sets of the porosity and permeability values. 
 
@@ -23,47 +56,81 @@ Below is a subset of our data. The data set we used is a table of different oil 
 source("../01 Data/Data.R", echo = TRUE)
 ```
 
+### STEP 3: Grabbing DataFrame from OracleDB.
 
-### Porosity & Permeability
+```{r}
+require("jsonlite")
+require("RCurl")
 
-PLOT #1: SCATTER
-We wanted to analyze the relationship between porosity and permeability for our data. To do this, we created a simple scatter plot to visualize this relationship.
+df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
+```
 
-![](../02 Tableau/PorvsPermAll.png)
+## Viewing Data
 
-This graph was slightly difficult to read, and we were also interested in the difference in this relationship depending on the time period. Thus, we separated the graph into pages by era and were left with the following graphs:
+### Summary of Data
 
-![](../02 Tableau/PorvsPermCenezoic.png)
+```{r}
+summary(df)
+```
 
-This graph first indicated to us that many Cenezoic substances were found in Texas and Louisiana. We were also able to visualize the positive relationship between porosity and permeability.
+### Preview of Data
+```{r}
+head(df)
+```
 
-![](../02 Tableau/PorvsPermMesezoic.png)
+### Subset of Data
 
-![](../02 Tableau/PorvsPermPaleozoic.png)
+Below is a subset of data where the HIPERM (or High Permeability) is greater than .5.
 
-In the Paleozoic era, there was significantly less variance in the permeability of these substances.
+```{r}
+subset <- subset(df, HIPERM > .5)
+head(subset)
+```
 
-These graphs introduced to us the hypothesis that different states may have widely varying porosity and permeability. Because scatter ploto makes it a little bit too crowded to interpret the data easily, we created a box plot which represents the range, median, quartiles, and outliers much better.
+Here's another example of the data where SYSNM (or geologic system name) is CRETACEOUS.
 
-PLOT #2: BOX PLOT
+```{r}
+subset <- subset(df, SYSNM == 'CRETACEOUS')
+head(subset)
+```
 
-![](../02 Tableau/PorvsPermState.png)
+## Visualizing Data with Shiny App 
 
-Interestingly, we can see that permeability varies significantly less than porosity and has a lot more outliers.
+First we need to load the neccessary packages.
 
-We can also see that some state has better average porosity than other, meaning the quality of the oil & gas reservoir is more desirable.
+On the UI Side, we need shiny and shinydashboard.
 
-### Histogram of Temperatures
+```{r}
+library(shiny)
+require(shinydashboard)
+```
 
-![](../02 Tableau/TempsCenozoic.png)
-![](../02 Tableau/TempsMesezoic.png)
+On the server side, we need other packages that would allow us to read in data from the Oracle SQL database, process it, and plot diferent visualizations.
 
-![](../02 Tableau/TempsPaleozoic.png)
+```{r}
+require("jsonlite")
+require("RCurl")
+require(ggplot2)
+require(dplyr)
+require(shiny)
+```
 
-These graphs allowed us to understand that in the Paleozoic era, rest temperatures were significantly lower than other eras.
+### STEP 4: Creating A Histogram Plotter
 
-### Geography of Findings
+In order to create a histogram plotter, we will create a list of options on the sidebar panel and plot the result in the main panel.
 
-![](../02 Tableau/Geographic.png)
+In this case, we will let the users decide which column of data they want to plot and how many cells they want to split into. The final result will find the frequency, or count of times a number within a range appears.
 
-This graph gave us an understanding of the overall geography of our data points. Visualizing it on a map helped us to understand the relative number of data points in each area depending on the area. Eras with more records have larger dots on this map.
+Interesting, we can see that some petrophysical variables like Reservoir Temperature follows a normal distribution while other follows almost a bi-normal distribituion.
+
+### STEP 5: Creating A K-means Clustering Plotter
+
+In order to create a K-means clustering plotter, we will create a list of x and y options, the number of clusters, etc. on the sidebar panel and plot the K-means clustering result in the main panel. 
+
+The final diagram plots the x and y values as scatter points and then try to do k-means analysis. K-means clustering is a method that attemps to divide the dataset into k number of clusters by connecting each data point to its closest mean value.
+
+
+### STEP 6: Creating Something (by Hanna)
+
+### STEP 7: Creating A Widgets To Filter Data
+

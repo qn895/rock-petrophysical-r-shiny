@@ -8,33 +8,37 @@ require(shiny)
 
 shinyServer(function(input, output) {
   hist_col_name <- reactive({input$hist_col_name})
-  state <- reactive(input$state)
   x_col_name <- reactive({input$x_col_name})    
   y_col_name <- reactive({input$y_col_name})
-  
+
   # GET DATA
-  df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', state=state, verbose = TRUE))))
+  # states = c('TEXAS', 'ALABAMA')
+  # state_query = paste("where state in (",paste(states, collapse=", "),")")
+  df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
   
-  selectedHistData <- eventReactive(input$plotHistogram, {
-    df[, c(input$x_col_name)]
+  subset(df)
+  
+  selectedHistData <- reactive({
+    df[, c(input$hist_col_name)]
   })
+  
   
   # GET DATA, FILTERED BY SELECTED X_COL_NAME AND Y_COL_NAME
-  selectedXData <- eventReactive(input$plotHistogram,{
+  selectedXData <- reactive({
     df[, c(input$x_col_name)]
   })
   
-  selectedYData <- eventReactive(input$plotHistogram,{
+  selectedYData <- reactive({
     df[, c(input$y_col_name)]
   })
   
   # UPDATE DATA AS NEEDED
-  selectedXandY <- eventReactive(input$plotHistogram,{
+  selectedXandY <- reactive({
     df[, c(input$x_col_name, input$y_col_name)]
   })
   
   # CLUSTER THE DATA
-  clusters <- eventReactive(input$plotClusters,{
+  clusters <- reactive({
     kmeans(selectedXandY(),input$num_of_clusters)
   })
 
@@ -53,6 +57,7 @@ shinyServer(function(input, output) {
         breaks = as.numeric(input$num_of_bins),
         main = "Frequency")
   })
+<<<<<<< HEAD
   
   output$campSelector <- renderUI({
     states <- unique(df['STATE'])
@@ -76,3 +81,7 @@ shinyServer(function(input, output) {
   })
   
   })
+=======
+})
+  
+>>>>>>> b085c507635f073b0666c228a8916941f35e41e9
