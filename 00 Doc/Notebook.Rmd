@@ -7,25 +7,48 @@ output:
     toc: true
 ---
 
-### Session Info
+## Session Info
 
 ```{r}
 sessionInfo()
 ```
 
-### Processing Data
+## Finding & Processing Data
 
-#### STEP 1: Find a dataset. 
+### STEP 1: Find a dataset. 
 
 The data set used is extracted from a CSV file called "GASISData.csv" data contains data from GASIS Reservoir Data System. GASIS, or Gas Information System, is an initiative by The Department of Energy to "combine previously compiled public domain data, newly acquired and interpreted data, and newly released data into a single database with over 18,000 reservoir records."
 
 The data set contains comprehensive field/reservoir identification, location, reservoir type, parameters, etc for oil and gas wells across the U.S. and is a useful tool to analyze the wells' petrophysical and geographical data on a large scale.
 
+Column Name | Column Name Explanation
+------------- | -------------
+STATE | state name
+FLDNAME | DOE/EIA field name 
+RESNAME | reservoir name
+R_STUDY | reservoir source (Atlas, Reserv. Study, TOTL)
+PLAYNAME | gas atlas geologic play name 
+PLAYCOD | gas atlas geologic play code
+ERANM | geologic era name
+SUBPLAYN | gas atlas subplay name
+SYSNM | geologic system name
+SERNM | geologic series name
+S_POR | data source for porosity 
+S_PERM | data source for permeability 
+LINKA | unique key for reservoir data system 
+AVPOR | average porosity of pay interval 
+LOPOR | porosity range minimum -net pay
+HIPOR | porosity range maximum -net pay 
+AVPERM | average permeability of pay interval 
+LOPERM | permeability range minimum 
+HIPERM | permeability range maximum 
+RESTEMP | average reservoir temperature 
+
 ```{r}
 read.csv("../01 Data/GASISData.csv", stringsAsFactors = FALSE)
 ```
 
-#### STEP 2: Clean up the data Using Extract, Transform, and Load techniques.
+### STEP 2: Clean up the data Using Extract, Transform, and Load techniques.
 
 Below is a subset of our data. The data set we used is a table of different oil & gas reservoirs across different states, geological regions, and geological era. In addition, it also contains different sets of the porosity and permeability values. 
 
@@ -33,13 +56,81 @@ Below is a subset of our data. The data set we used is a table of different oil 
 source("../01 Data/Data.R", echo = TRUE)
 ```
 
-### Getting Started With Shiny App 
+### STEP 3: Grabbing DataFrame from OracleDB.
 
-#### STEP 3: Creating A Histogram Plotter
+```{r}
+require("jsonlite")
+require("RCurl")
 
-#### STEP 4: Creating A K-means Clustering Plotter
+df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
+```
 
-#### STEP 5: Creating Something (by Hanna)
+## Viewing Data
 
-#### STEP 6: Creating A Widgets To Filter Data
+### Summary of Data
+
+```{r}
+summary(df)
+```
+
+### Preview of Data
+```{r}
+head(df)
+```
+
+### Subset of Data
+
+Below is a subset of data where the HIPERM (or High Permeability) is greater than .5.
+
+```{r}
+subset <- subset(df, HIPERM > .5)
+head(subset)
+```
+
+Here's another example of the data where SYSNM (or geologic system name) is CRETACEOUS.
+
+```{r}
+subset <- subset(df, SYSNM == 'CRETACEOUS')
+head(subset)
+```
+
+## Visualizing Data with Shiny App 
+
+First we need to load the neccessary packages.
+
+On the UI Side, we need shiny and shinydashboard.
+
+```{r}
+library(shiny)
+require(shinydashboard)
+```
+
+On the server side, we need other packages that would allow us to read in data from the Oracle SQL database, process it, and plot diferent visualizations.
+
+```{r}
+require("jsonlite")
+require("RCurl")
+require(ggplot2)
+require(dplyr)
+require(shiny)
+```
+
+### STEP 4: Creating A Histogram Plotter
+
+In order to create a histogram plotter, we will create a list of options on the sidebar panel and plot the result in the main panel.
+
+In this case, we will let the users decide which column of data they want to plot and how many cells they want to split into. The final result will find the frequency, or count of times a number within a range appears.
+
+Interesting, we can see that some petrophysical variables like Reservoir Temperature follows a normal distribution while other follows almost a bi-normal distribituion.
+
+### STEP 5: Creating A K-means Clustering Plotter
+
+In order to create a K-means clustering plotter, we will create a list of x and y options, the number of clusters, etc. on the sidebar panel and plot the K-means clustering result in the main panel. 
+
+The final diagram plots the x and y values as scatter points and then try to do k-means analysis. K-means clustering is a method that attemps to divide the dataset into k number of clusters by connecting each data point to its closest mean value.
+
+
+### STEP 6: Creating Something (by Hanna)
+
+### STEP 7: Creating A Widgets To Filter Data
 

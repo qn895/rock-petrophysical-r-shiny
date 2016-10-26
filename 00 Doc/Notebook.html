@@ -126,12 +126,27 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#session-info">Session Info</a></li>
-<li><a href="#processing-data">Processing Data</a></li>
+<li><a href="#finding-processing-data">Finding &amp; Processing Data</a><ul>
+<li><a href="#step-1-find-a-dataset.">STEP 1: Find a dataset.</a></li>
+<li><a href="#step-2-clean-up-the-data-using-extract-transform-and-load-techniques.">STEP 2: Clean up the data Using Extract, Transform, and Load techniques.</a></li>
+<li><a href="#step-3-grabbing-dataframe-from-oracledb.">STEP 3: Grabbing DataFrame from OracleDB.</a></li>
+</ul></li>
+<li><a href="#viewing-data">Viewing Data</a><ul>
+<li><a href="#summary-of-data">Summary of Data</a></li>
+<li><a href="#preview-of-data">Preview of Data</a></li>
+<li><a href="#subset-of-data">Subset of Data</a></li>
+</ul></li>
+<li><a href="#visualizing-data-with-shiny-app">Visualizing Data with Shiny App</a><ul>
+<li><a href="#step-4-creating-a-histogram-plotter">STEP 4: Creating A Histogram Plotter</a></li>
+<li><a href="#step-5-creating-a-k-means-clustering-plotter">STEP 5: Creating A K-means Clustering Plotter</a></li>
+<li><a href="#step-6-creating-something-by-hanna">STEP 6: Creating Something (by Hanna)</a></li>
+<li><a href="#step-7-creating-a-widgets-to-filter-data">STEP 7: Creating A Widgets To Filter Data</a></li>
+</ul></li>
 </ul>
 </div>
 
-<div id="session-info" class="section level3">
-<h3>Session Info</h3>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.2.1 (2015-06-18)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
@@ -154,12 +169,102 @@ $(document).ready(function () {
 ## [10] knitr_1.14         stringr_1.1.0      digest_0.6.10     
 ## [13] evaluate_0.10</code></pre>
 </div>
-<div id="processing-data" class="section level3">
-<h3>Processing Data</h3>
-<div id="step-1-find-a-dataset." class="section level4">
-<h4>STEP 1: Find a dataset.</h4>
+<div id="finding-processing-data" class="section level2">
+<h2>Finding &amp; Processing Data</h2>
+<div id="step-1-find-a-dataset." class="section level3">
+<h3>STEP 1: Find a dataset.</h3>
 <p>The data set used is extracted from a CSV file called “GASISData.csv” data contains data from GASIS Reservoir Data System. GASIS, or Gas Information System, is an initiative by The Department of Energy to “combine previously compiled public domain data, newly acquired and interpreted data, and newly released data into a single database with over 18,000 reservoir records.”</p>
 <p>The data set contains comprehensive field/reservoir identification, location, reservoir type, parameters, etc for oil and gas wells across the U.S. and is a useful tool to analyze the wells’ petrophysical and geographical data on a large scale.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Column Name</th>
+<th>Column Name Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>STATE</td>
+<td>state name</td>
+</tr>
+<tr class="even">
+<td>FLDNAME</td>
+<td>DOE/EIA field name</td>
+</tr>
+<tr class="odd">
+<td>RESNAME</td>
+<td>reservoir name</td>
+</tr>
+<tr class="even">
+<td>R_STUDY</td>
+<td>reservoir source (Atlas, Reserv. Study, TOTL)</td>
+</tr>
+<tr class="odd">
+<td>PLAYNAME</td>
+<td>gas atlas geologic play name</td>
+</tr>
+<tr class="even">
+<td>PLAYCOD</td>
+<td>gas atlas geologic play code</td>
+</tr>
+<tr class="odd">
+<td>ERANM</td>
+<td>geologic era name</td>
+</tr>
+<tr class="even">
+<td>SUBPLAYN</td>
+<td>gas atlas subplay name</td>
+</tr>
+<tr class="odd">
+<td>SYSNM</td>
+<td>geologic system name</td>
+</tr>
+<tr class="even">
+<td>SERNM</td>
+<td>geologic series name</td>
+</tr>
+<tr class="odd">
+<td>S_POR</td>
+<td>data source for porosity</td>
+</tr>
+<tr class="even">
+<td>S_PERM</td>
+<td>data source for permeability</td>
+</tr>
+<tr class="odd">
+<td>LINKA</td>
+<td>unique key for reservoir data system</td>
+</tr>
+<tr class="even">
+<td>AVPOR</td>
+<td>average porosity of pay interval</td>
+</tr>
+<tr class="odd">
+<td>LOPOR</td>
+<td>porosity range minimum -net pay</td>
+</tr>
+<tr class="even">
+<td>HIPOR</td>
+<td>porosity range maximum -net pay</td>
+</tr>
+<tr class="odd">
+<td>AVPERM</td>
+<td>average permeability of pay interval</td>
+</tr>
+<tr class="even">
+<td>LOPERM</td>
+<td>permeability range minimum</td>
+</tr>
+<tr class="odd">
+<td>HIPERM</td>
+<td>permeability range maximum</td>
+</tr>
+<tr class="even">
+<td>RESTEMP</td>
+<td>average reservoir temperature</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>read.csv(&quot;../01 Data/GASISData.csv&quot;, stringsAsFactors = FALSE)</code></pre>
 <pre><code>##       LINKA         STATE                            FLDNAME
 ## 1         1       ALABAMA                           ALOE BAY
@@ -17379,8 +17484,8 @@ $(document).ready(function () {
 ## 537          G       67     6725        E    DELTA         
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 18683 rows ]</code></pre>
 </div>
-<div id="step-2-clean-up-the-data-using-extract-transform-and-load-techniques." class="section level4">
-<h4>STEP 2: Clean up the data Using Extract, Transform, and Load techniques.</h4>
+<div id="step-2-clean-up-the-data-using-extract-transform-and-load-techniques." class="section level3">
+<h3>STEP 2: Clean up the data Using Extract, Transform, and Load techniques.</h3>
 <p>Below is a subset of our data. The data set we used is a table of different oil &amp; gas reservoirs across different states, geological regions, and geological era. In addition, it also contains different sets of the porosity and permeability values.</p>
 <pre class="r"><code>source(&quot;../01 Data/Data.R&quot;, echo = TRUE)</code></pre>
 <pre><code>## 
@@ -17401,6 +17506,14 @@ $(document).ready(function () {
 <pre><code>## 
 ## &gt; df &lt;- data.frame(fromJSON(getURL(URLencode(&quot;oraclerest.cs.utexas.edu:5001/rest/native/?query=\&quot;select * from GASISDATA\&quot;&quot;), 
 ## +     httpheader = c(DB .... [TRUNCATED] 
+## 
+## &gt; (unique(df$STATE))
+##  [1] ALABAMA       ARKANSAS      ARIZONA       COLORADO      FLORIDA      
+##  [6] KANSAS        KENTUCKY      LOUISIANA     OHIO          OKLAHOMA     
+## [11] MISSISSIPPI   NEW MEXICO    NEW YORK      OTHER GULF    MARYLAND     
+## [16] TEXAS         TENNESSEE     PENNSYLVANIA  WEST VIRGINIA UTAH         
+## [21] WYOMING       VIRGINIA     
+## 22 Levels: ALABAMA ARIZONA ARKANSAS COLORADO FLORIDA KANSAS ... WYOMING
 ## 
 ## &gt; summary(df)
 ##            STATE                    FLDNAME         RESNAME      R_STUDY  
@@ -17545,6 +17658,209 @@ $(document).ready(function () {
 ## 69    14    22      0    506    642     135
 ## 70    13    24    356      0      0     132
 ## 73     0    21      1      0      0     181</code></pre>
+</div>
+<div id="step-3-grabbing-dataframe-from-oracledb." class="section level3">
+<h3>STEP 3: Grabbing DataFrame from OracleDB.</h3>
+<pre class="r"><code>require(&quot;jsonlite&quot;)
+require(&quot;RCurl&quot;)
+
+df &lt;- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query=&quot;select * from GASISDATA&quot;'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))</code></pre>
+</div>
+</div>
+<div id="viewing-data" class="section level2">
+<h2>Viewing Data</h2>
+<div id="summary-of-data" class="section level3">
+<h3>Summary of Data</h3>
+<pre class="r"><code>summary(df)</code></pre>
+<pre><code>##            STATE                    FLDNAME         RESNAME      R_STUDY  
+##  LOUISIANA    :9005   WEST DELTA BLK 30 :  114   358CLNN:  186   A:13531  
+##  TEXAS        :5363   BAY MARCHAND BLK 2:  103   NO NAME:  150   R: 1255  
+##  OKLAHOMA     : 736   GRAND ISLE BLK 43 :   92   339BERE:  138   T: 4434  
+##  WEST VIRGINIA: 696   SHIP SHOAL BLK 113:   82   330MSSP:  134            
+##  PENNSYLVANIA : 543   SOUTH PASS BLK 27 :   80   332BGLM:  131            
+##  OHIO         : 535   SHIP SHOAL BLK 176:   64   MORROW :  122            
+##  (Other)      :2342   (Other)           :18685   (Other):18359            
+##                                                  PLAYNAME    
+##  null                                                : 1289  
+##  LOWER PLEISTOCENE PROGRADATIONAL SANDSTONE          : 1229  
+##  UPPER UPPER MIOCENE EASTERN PROGRADATIONAL SANDSTONE: 1080  
+##  LOWER PLIOCENE EASTERN PROGRADATIONAL SANDSTONE     :  682  
+##  UPPER PLIOCENE PROGRADATIONAL SANDSTONE             :  660  
+##  MIDDLE PLEISTOCENE PROGRADATIONAL SANDSTONE         :  653  
+##  (Other)                                             :13627  
+##      PLAYCOD            ERANM       SUBPLAYN               SYSNM     
+##  null    : 1288   CENOZOIC :11658   null:19220   TERTIARY     :7947  
+##  LPL P.1 : 1229   MESOZOIC : 1223                QUATERNARY   :3711  
+##  UM3 P.1B: 1080   null     : 1517                null         :1521  
+##  LP P.1B :  682   PALEOZOIC: 4821                PENNSYLVANIAN:1373  
+##  UP P.1  :  660   PALEOZOK :    1                MISSISSIPPIAN:1138  
+##  MPL P.1 :  653                                  DEVONIAN     :1108  
+##  (Other) :13628                                  (Other)      :2422  
+##             SERNM       S_POR        S_PERM          LINKA      
+##  MIOCENE       :4359   A   :10449   A   :  465   Min.   :    1  
+##  PLEISTOCENE   :3710   null: 5815   null:16949   1st Qu.: 4806  
+##  null          :2543   R   : 1216   R   :   53   Median : 9610  
+##  PLIOCENE      :1913   T   : 1740   T   : 1753   Mean   : 9610  
+##  OLIGOCENE     :1129                             3rd Qu.:14415  
+##  UPPER DEVONIAN: 718                             Max.   :19220  
+##  (Other)       :4848                                            
+##      AVPOR           LOPOR             HIPOR            AVPERM       
+##  Min.   : 0.00   Min.   : 0.0000   Min.   : 0.000   Min.   :   0.00  
+##  1st Qu.: 0.00   1st Qu.: 0.0000   1st Qu.: 0.000   1st Qu.:   0.00  
+##  Median :22.00   Median : 0.0000   Median : 0.000   Median :   0.00  
+##  Mean   :16.71   Mean   : 0.5727   Mean   : 1.904   Mean   :  27.61  
+##  3rd Qu.:29.00   3rd Qu.: 0.0000   3rd Qu.: 0.000   3rd Qu.:   0.00  
+##  Max.   :98.00   Max.   :33.0000   Max.   :43.000   Max.   :8200.00  
+##                                                                      
+##      LOPERM             HIPERM           RESTEMP     
+##  Min.   :   0.000   Min.   :    0.0   Min.   :  0.0  
+##  1st Qu.:   0.000   1st Qu.:    0.0   1st Qu.:  0.0  
+##  Median :   0.000   Median :    0.0   Median :135.0  
+##  Mean   :   2.188   Mean   :   32.3   Mean   :111.6  
+##  3rd Qu.:   0.000   3rd Qu.:    0.0   3rd Qu.:184.0  
+##  Max.   :4016.000   Max.   :27412.0   Max.   :414.0  
+## </code></pre>
+</div>
+<div id="preview-of-data" class="section level3">
+<h3>Preview of Data</h3>
+<pre class="r"><code>head(df)</code></pre>
+<pre><code>##     STATE            FLDNAME   RESNAME R_STUDY
+## 1 ALABAMA           ALOE BAY  NORPHLET       A
+## 2 ALABAMA          BEAVERTON CARTER NE       R
+## 3 ALABAMA          BEAVERTON CARTER SE       R
+## 4 ALABAMA          BEAVERTON     LEWIS       R
+## 5 ALABAMA      BETHEL CHURCH    CARTER       R
+## 6 ALABAMA BIG ESCAMBIA CREEK SMACKOVER       T
+##                                                                                 PLAYNAME
+## 1                                                 UPPER JURASSIC AGGRADATIONAL SANDSTONE
+## 2 PENNSYLVANIAN-MISSISSIPPIAN DELTAIC AND MARINE SHELF SANDSTONE-ALABAMA AND MISSISSIPPI
+## 3 PENNSYLVANIAN-MISSISSIPPIAN DELTAIC AND MARINE SHELF SANDSTONE-ALABAMA AND MISSISSIPPI
+## 4 PENNSYLVANIAN-MISSISSIPPIAN DELTAIC AND MARINE SHELF SANDSTONE-ALABAMA AND MISSISSIPPI
+## 5 PENNSYLVANIAN-MISSISSIPPIAN DELTAIC AND MARINE SHELF SANDSTONE-ALABAMA AND MISSISSIPPI
+## 6                     UPPER JURASSIC SHALLOW-MARINE CARBONATE AND SANDSTONE-MAFLA REGION
+##     PLAYCOD     ERANM SUBPLAYN         SYSNM            SERNM S_POR S_PERM
+## 1    UU A.1  MESOZOIC     null      JURASSIC   UPPER JURASSIC     A   null
+## 2 GCPN-MS-1 PALEOZOIC     null MISSISSIPPIAN UPPER CHESTERIAN     R   null
+## 3 GCPN-MS-1 PALEOZOIC     null MISSISSIPPIAN UPPER CHESTERIAN     R   null
+## 4 GCPN-MS-1 PALEOZOIC     null MISSISSIPPIAN UPPER CHESTERIAN     R   null
+## 5 GCPN-MS-1 PALEOZOIC     null MISSISSIPPIAN UPPER CHESTERIAN     R   null
+## 6    GCJC-3  MESOZOIC     null      JURASSIC   UPPER JURASSIC     T      T
+##   LINKA AVPOR LOPOR HIPOR AVPERM LOPERM HIPERM RESTEMP
+## 1     1  11.0     0     0      0      0      0       0
+## 2     2  15.6    13    19      0      0      0      94
+## 3     3  12.0     3    17      0      0      0      92
+## 4     4  10.3     4    15      0      0      0      99
+## 5     5  10.0     5    18      0      0      0      88
+## 6     6  14.0     0     0     10      0      0     280</code></pre>
+</div>
+<div id="subset-of-data" class="section level3">
+<h3>Subset of Data</h3>
+<p>Below is a subset of data where the HIPERM (or High Permeability) is greater than .5.</p>
+<pre class="r"><code>subset &lt;- subset(df, HIPERM &gt; .5)
+head(subset)</code></pre>
+<pre><code>##       STATE      FLDNAME   RESNAME R_STUDY
+## 15  ALABAMA    CHUNCHULA SMACKOVER       R
+## 45 ARKANSAS      MASSARD     SPIRO       A
+## 47 ARKANSAS       MIDWAY  REYNOLDS       T
+## 48 ARKANSAS    OAK GROVE      HALE       A
+## 49 ARKANSAS PETER PENDER      HALE       A
+## 50 ARKANSAS         ROSS    DUNN A       A
+##                                                                                         PLAYNAME
+## 15                            UPPER JURASSIC SHALLOW-MARINE CARBONATE AND SANDSTONE-MAFLA REGION
+## 45 ATOKA CHANNEL, SUBMARINE-FAN, AND TRANSGRESSIVE SANDSTONE-ARKOMA BASIN, OKLAHOMA AND ARKANSAS
+## 47                                       UPPER JURASSIC SHALLOW-MARINE CARBONATE-ARKLATEX REGION
+## 48                MORROW NEARSHORE, SHALLOW-MARINE SANDSTONE-ARKOMA BASIN, OKLAHOMA AND ARKANSAS
+## 49                MORROW NEARSHORE, SHALLOW-MARINE SANDSTONE-ARKOMA BASIN, OKLAHOMA AND ARKANSAS
+## 50 ATOKA CHANNEL, SUBMARINE-FAN, AND TRANSGRESSIVE SANDSTONE-ARKOMA BASIN, OKLAHOMA AND ARKANSAS
+##    PLAYCOD    ERANM SUBPLAYN    SYSNM          SERNM S_POR S_PERM LINKA
+## 15  GCJC-3 MESOZOIC     null JURASSIC UPPER JURASSIC     R      T    15
+## 45 MCPN-22     null     null     null           null     A      A    89
+## 47  GCJC-1 MESOZOIC     null JURASSIC UPPER JURASSIC     T      T    91
+## 48 MCPN-23     null     null     null           null  null      A    92
+## 49 MCPN-23     null     null     null           null     A      A    93
+## 50 MCPN-22     null     null     null           null     A      A    94
+##    AVPOR LOPOR HIPOR AVPERM LOPERM HIPERM RESTEMP
+## 15  11.7     0    24      2   0.01    100     297
+## 45  16.0     0     0      0   0.13     24       0
+## 47  26.0     0     0    150   0.00    450     182
+## 48   0.0     0     0      0   0.20     42       0
+## 49  13.0     0     0      0   0.20     42       0
+## 50  17.5     0     0      0   0.13     24       0</code></pre>
+<p>Here’s another example of the data where SYSNM (or geologic system name) is CRETACEOUS.</p>
+<pre class="r"><code>subset &lt;- subset(df, SYSNM == 'CRETACEOUS')
+head(subset)</code></pre>
+<pre><code>##       STATE    FLDNAME     RESNAME R_STUDY
+## 16  ALABAMA CITRONELLE     RODESSA       T
+## 57 ARKANSAS  SMACKOVER   OLD SANDS       T
+## 65 ARKANSAS    VILLAGE TRAVIS PEAK       T
+## 69 COLORADO      ADENA      D SAND       R
+## 70 COLORADO      ADENA      J SAND       R
+## 73 COLORADO     AMBUSH           J       R
+##                                                           PLAYNAME PLAYCOD
+## 16         TRINITY GROUP SANDSTONE-MISSISSIPPI INTERIOR SALT BASIN  GCKS-8
+## 57         UPPER JURASSIC SHALLOW-MARINE CARBONATE-ARKLATEX REGION  GCJC-1
+## 65 HOSSTON SANDSTONE-NORTH LOUISIANA AND SOUTH ARKANSAS SALT BASIN GCKS-10
+## 69                                                          D SAND  RMDB-4
+## 70                                                  MUDDY (J) SAND  RMDB-5
+## 73                                                  MUDDY (J) SAND  RMDB-5
+##       ERANM SUBPLAYN      SYSNM            SERNM S_POR S_PERM LINKA AVPOR
+## 16 MESOZOIC     null CRETACEOUS LOWER CRETACEOUS     T      T    16  10.0
+## 57 MESOZOIC     null CRETACEOUS    UPPER GULFIAN  null   null   101   0.0
+## 65 MESOZOIC     null CRETACEOUS  LOWER COAHUILAN     T      T   109  26.0
+## 69 MESOZOIC     null CRETACEOUS LOWER CRETACEOUS     R      T   113  19.6
+## 70 MESOZOIC     null CRETACEOUS LOWER CRETACEOUS     R      T   114  17.7
+## 73 MESOZOIC     null CRETACEOUS LOWER CRETACEOUS     R      T   117   9.1
+##    LOPOR HIPOR AVPERM LOPERM HIPERM RESTEMP
+## 16     0     0    400      0      0     155
+## 57     0     0      0      0      0       0
+## 65     0     0    706      0      0       0
+## 69    14    22      0    506    642     135
+## 70    13    24    356      0      0     132
+## 73     0    21      1      0      0     181</code></pre>
+</div>
+</div>
+<div id="visualizing-data-with-shiny-app" class="section level2">
+<h2>Visualizing Data with Shiny App</h2>
+<p>First we need to load the neccessary packages.</p>
+<p>On the UI Side, we need shiny and shinydashboard.</p>
+<pre class="r"><code>library(shiny)</code></pre>
+<pre><code>## Warning: package 'shiny' was built under R version 3.2.5</code></pre>
+<pre><code>## 
+## Attaching package: 'shiny'</code></pre>
+<pre><code>## The following object is masked from 'package:jsonlite':
+## 
+##     validate</code></pre>
+<pre class="r"><code>require(shinydashboard)</code></pre>
+<pre><code>## Loading required package: shinydashboard</code></pre>
+<pre><code>## Warning: package 'shinydashboard' was built under R version 3.2.5</code></pre>
+<pre><code>## 
+## Attaching package: 'shinydashboard'</code></pre>
+<pre><code>## The following object is masked from 'package:graphics':
+## 
+##     box</code></pre>
+<p>On the server side, we need other packages that would allow us to read in data from the Oracle SQL database, process it, and plot diferent visualizations.</p>
+<pre class="r"><code>require(&quot;jsonlite&quot;)
+require(&quot;RCurl&quot;)
+require(ggplot2)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.2.5</code></pre>
+<pre class="r"><code>require(dplyr)</code></pre>
+<pre><code>## Loading required package: dplyr</code></pre>
+<pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called 'dplyr'</code></pre>
+<pre class="r"><code>require(shiny)</code></pre>
+<div id="step-4-creating-a-histogram-plotter" class="section level3">
+<h3>STEP 4: Creating A Histogram Plotter</h3>
+<p>In order to create a histogram plotter, we will create a list of options on the sidebar panel and plot the result in the main panel.</p>
+</div>
+<div id="step-5-creating-a-k-means-clustering-plotter" class="section level3">
+<h3>STEP 5: Creating A K-means Clustering Plotter</h3>
+</div>
+<div id="step-6-creating-something-by-hanna" class="section level3">
+<h3>STEP 6: Creating Something (by Hanna)</h3>
+</div>
+<div id="step-7-creating-a-widgets-to-filter-data" class="section level3">
+<h3>STEP 7: Creating A Widgets To Filter Data</h3>
 </div>
 </div>
 
