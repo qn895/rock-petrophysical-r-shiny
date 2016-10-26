@@ -16,13 +16,9 @@ shinyServer(function(input, output) {
   df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', state=state, verbose = TRUE))))
   
   selectedHistData <- eventReactive(input$plotHistogram, {
-    df[, c(input$hist_col_name)]
+    df[, c(input$x_col_name)]
   })
   
-  selectedBoxPlotData <- eventReactive(input$plotBoxPlot, {
-    df[, c(input$variable)]
-  })
-
   # GET DATA, FILTERED BY SELECTED X_COL_NAME AND Y_COL_NAME
   selectedXData <- eventReactive(input$plotHistogram,{
     df[, c(input$x_col_name)]
