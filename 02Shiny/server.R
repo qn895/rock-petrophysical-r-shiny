@@ -57,8 +57,7 @@ shinyServer(function(input, output) {
         breaks = as.numeric(input$num_of_bins),
         main = "Frequency")
   })
-<<<<<<< HEAD
-  
+
   output$campSelector <- renderUI({
     states <- unique(df['STATE'])
     selectInput("state", "Choose State To Filter Data By:", as.list(states),selected="TEXAS") 
@@ -81,7 +80,3 @@ shinyServer(function(input, output) {
   })
   
   })
-=======
-})
-  
->>>>>>> b085c507635f073b0666c228a8916941f35e41e9
