@@ -1,6 +1,6 @@
 ---
 title: "Oil & Gas Wells' Petrophysical and Geographical Data"
-author: "Quynh Nguyen (qmn76), Mark Metzger (mm73828), Hanna Jones ()"
+author: "Quynh Nguyen (qmn76), Mark Metzger (mm73828), Hanna Jones (hmj427)"
 date: "October 26, 2016"
 output: 
   html_document:
@@ -130,7 +130,26 @@ In order to create a K-means clustering plotter, we will create a list of x and 
 The final diagram plots the x and y values as scatter points and then try to do k-means analysis. K-means clustering is a method that attemps to divide the dataset into k number of clusters by connecting each data point to its closest mean value.
 
 
-### STEP 6: Creating Something (by Hanna)
+### STEP 6: Creating a Box Plot
+
+We thought it would be interesting to visualize the difference in reservoir temperatures for various dimensions. Specifically, this visualization aims to answer the following: How do reservoir temperatures differ between states, geological eras, and geologic systems?
+
+To do this, we first filtered our data by adjusting the SQL query to exclude any null reservoir temperatures.
+```{SQL}
+select * from GASISDATA where RESTEMP IS NOT NULL and RESTEMP > 0 and SYSNM IS NOT NULL and ERANM IS NOT NULL AND STATE IS NOT NULL
+```
+
+We created an option to exclude or include outliers, as they may skew the graph and thus our conclusions about what the graph says. We also created a list of dimensions for which we would like to use to compare temperatures, and displayed this in a drop down for the user to select. An example of this code is below:
+```{r}
+selectInput("variable", "Variable:",
+                list("State" = "STATE", 
+                     "Geologic Era" = "ERANM", 
+                     "Geologic System" = "SYSNM"))
+    
+    checkboxInput("outliers", "Show outliers", FALSE)
+```
+
+While this graph does not show a detailed explanation of temperatures, it allows for a high-level visualization of the disparity in different states and geological eras or systems.
 
 ### STEP 7: Creating A Widgets To Filter Data
 
