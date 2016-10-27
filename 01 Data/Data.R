@@ -17,6 +17,3 @@ subset <- subset(df, SYSNM == 'CRETACEOUS')
 head(subset)
 
 mean(df[['AVPOR']],na.rm = TRUE)
-
-col_name = "AVPOR"
-"title: " + col_name

@@ -46,7 +46,7 @@ headerPanel("Project 4!"),
     selectInput("variable", "Variable:",
                 list("State" = "STATE", 
                      "Geologic Era" = "ERANM", 
-                     "Geologic System Name" = "SYSNM")),
+                     "Geologic System" = "SYSNM")),
     
     checkboxInput("outliers", "Show outliers", FALSE)
   
