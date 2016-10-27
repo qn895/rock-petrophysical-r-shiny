@@ -52,9 +52,6 @@ read.csv("../01 Data/GASISData.csv", stringsAsFactors = FALSE)
 
 Below is a subset of our data. The data set we used is a table of different oil & gas reservoirs across different states, geological regions, and geological era. In addition, it also contains different sets of the porosity and permeability values. 
 
-```{r}
-source("../01 Data/Data.R", echo = TRUE)
-```
 
 ### STEP 3: Grabbing DataFrame from OracleDB.
 
@@ -64,6 +61,7 @@ require("RCurl")
 
 df <- data.frame(fromJSON(getURL(URLencode('oraclerest.cs.utexas.edu:5001/rest/native/?query="select * from GASISDATA"'),httpheader=c(DB='jdbc:oracle:thin:@aevum.cs.utexas.edu:1521/f16pdb', USER='cs329e_qmn76', PASS='orcl_qmn76', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
 ```
+
 
 ## Viewing Data
 
@@ -93,6 +91,7 @@ Here's another example of the data where SYSNM (or geologic system name) is CRET
 subset <- subset(df, SYSNM == 'CRETACEOUS')
 head(subset)
 ```
+
 
 ## Visualizing Data with Shiny App 
 
@@ -134,9 +133,6 @@ The final diagram plots the x and y values as scatter points and then try to do 
 We thought it would be interesting to visualize the difference in reservoir temperatures for various dimensions. Specifically, this visualization aims to answer the following: How do reservoir temperatures differ between states, geological eras, and geologic systems?
 
 To do this, we first filtered our data by adjusting the SQL query to exclude any null reservoir temperatures.
-```{SQL}
-select * from GASISDATA where RESTEMP IS NOT NULL and RESTEMP > 0 and SYSNM IS NOT NULL and ERANM IS NOT NULL AND STATE IS NOT NULL
-```
 
 We created an option to exclude or include outliers, as they may skew the graph and thus our conclusions about what the graph says. We also created a list of dimensions for which we would like to use to compare temperatures, and displayed this in a drop down for the user to select.
 
@@ -146,35 +142,15 @@ While this graph does not show a detailed explanation of temperatures, it allows
 
 We organized our app into a ShinyUI application with a sidebar panel where we placed filters for the user. An example of a filter we created is below:
 
-```{r}
-selectInput("variable", "Variable:",
-                list("State" = "STATE", 
-                     "Geologic Era" = "ERANM", 
-                     "Geologic System" = "SYSNM"))
-    
-    checkboxInput("outliers", "Show outliers", FALSE)
-```
 
 This allows the user to select an input from the list for the Box Plot that we created. When the user selects a choice, the graph updates accordingly.
 
 In the main panel, we placed all of the graphs that we created in the steps above. An example of how this is done is below:
-```{r}
-# Show a plot of the generated distribution
-  mainPanel(
-    plotOutput("histPlot"),
-    plotOutput("clusterPlot"),
-    plotOutput("boxPlot")
-  )
-```
 
 ### Putting it All Together
 
 Below is the full server code and UI code. The server code includes all of our database queries and creation of the plots. The UI code is how we organized the Shiny application and created widgets for user input.
 
-```{r}
-source("../02Shiny/server.R", echo = TRUE)
-```
+**[Final Result](https://cs329equynhmarkhanna.shinyapps.io/02Shiny/)**
 
-```{r}
-source("../02Data/ui.R", echo = TRUE)
-```
+
