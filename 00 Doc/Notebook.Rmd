@@ -129,7 +129,6 @@ In order to create a K-means clustering plotter, we will create a list of x and 
 
 The final diagram plots the x and y values as scatter points and then try to do k-means analysis. K-means clustering is a method that attemps to divide the dataset into k number of clusters by connecting each data point to its closest mean value.
 
-
 ### STEP 6: Creating a Box Plot
 
 We thought it would be interesting to visualize the difference in reservoir temperatures for various dimensions. Specifically, this visualization aims to answer the following: How do reservoir temperatures differ between states, geological eras, and geologic systems?
@@ -139,7 +138,14 @@ To do this, we first filtered our data by adjusting the SQL query to exclude any
 select * from GASISDATA where RESTEMP IS NOT NULL and RESTEMP > 0 and SYSNM IS NOT NULL and ERANM IS NOT NULL AND STATE IS NOT NULL
 ```
 
-We created an option to exclude or include outliers, as they may skew the graph and thus our conclusions about what the graph says. We also created a list of dimensions for which we would like to use to compare temperatures, and displayed this in a drop down for the user to select. An example of this code is below:
+We created an option to exclude or include outliers, as they may skew the graph and thus our conclusions about what the graph says. We also created a list of dimensions for which we would like to use to compare temperatures, and displayed this in a drop down for the user to select.
+
+While this graph does not show a detailed explanation of temperatures, it allows for a high-level visualization of the disparity in different states and geological eras or systems.
+
+### STEP 7: Creating A Widgets To Filter Data
+
+We organized our app into a ShinyUI application with a sidebar panel where we placed filters for the user. An example of a filter we created is below:
+
 ```{r}
 selectInput("variable", "Variable:",
                 list("State" = "STATE", 
@@ -149,7 +155,26 @@ selectInput("variable", "Variable:",
     checkboxInput("outliers", "Show outliers", FALSE)
 ```
 
-While this graph does not show a detailed explanation of temperatures, it allows for a high-level visualization of the disparity in different states and geological eras or systems.
+This allows the user to select an input from the list for the Box Plot that we created. When the user selects a choice, the graph updates accordingly.
 
-### STEP 7: Creating A Widgets To Filter Data
+In the main panel, we placed all of the graphs that we created in the steps above. An example of how this is done is below:
+```{r}
+# Show a plot of the generated distribution
+  mainPanel(
+    plotOutput("histPlot"),
+    plotOutput("clusterPlot"),
+    plotOutput("boxPlot")
+  )
+```
 
+### Putting it All Together
+
+Below is the full server code and UI code. The server code includes all of our database queries and creation of the plots. The UI code is how we organized the Shiny application and created widgets for user input.
+
+```{r}
+source("../02Shiny/server.R", echo = TRUE)
+```
+
+```{r}
+source("../02Data/ui.R", echo = TRUE)
+```
